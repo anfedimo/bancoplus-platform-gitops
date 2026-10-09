@@ -9,7 +9,7 @@ components:
 images:
   - name: payments-qr
     newName: 512943205201.dkr.ecr.us-east-1.amazonaws.com/bancoplus/payments-qr
-    newTag: 1.0.0
+    newTag: 7d4b0132707cbe104657e5b490b88eacfce3a7a4 # bancoplus-payments-qr@7d4b013 · CI run 37986643702
 patches:
   - target:
       kind: Deployment
