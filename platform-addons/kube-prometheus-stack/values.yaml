@@ -45,8 +45,8 @@ grafana:
       jsonData:
         serviceMap: { datasourceUid: prometheus }
         nodeGraph: { enabled: true }
+  # El APM legado se consulta en su propia consola: el plugin Jaeger de Grafana requiere la API v1,
+  # eliminada en Jaeger 2.x
+  deleteDatasources:
     - name: APM legado (stand-in)
-      type: jaeger
-      uid: apm-legacy
-      url: http://apm-legacy-standin.observability.svc.cluster.local:16686
-      access: proxy
+      orgId: 1
