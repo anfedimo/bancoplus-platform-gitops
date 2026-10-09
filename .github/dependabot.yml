@@ -1,0 +1,9 @@
+# Actualización automática por PR: kubeconform y helm template validan cada propuesta.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: weekly, day: monday }
+    groups:
+      actions: { patterns: ["*"] }
+    commit-message: { prefix: ":octocat:" }
