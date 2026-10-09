@@ -1,0 +1,32 @@
+# Contrato de autoinstrumentación Java: exporta al agente de nodo, captura X-Business-* y delega el
+# muestreo al Gateway (tail sampling). Métricas y logs del agente deshabilitados: RED se deriva de spans.
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: java-zero-code
+  namespace: pagos
+  labels:
+    app.kubernetes.io/part-of: reliability-platform
+spec:
+  exporter:
+    endpoint: "http://otel-node-agent.observability.svc.cluster.local:4318"
+  propagators:
+    - tracecontext
+    - baggage
+    - b3multi
+  sampler:
+    type: parentbased_always_on
+  resource:
+    addK8sUIDAttributes: true
+    resourceAttributes:
+      migration.wave: F1-piloto
+      team.tribe: tribu-pagos
+  java:
+    env:
+      - name: OTEL_INSTRUMENTATION_HTTP_SERVER_CAPTURE_RESPONSE_HEADERS
+        value: "X-Business-Operation,X-Business-Outcome,X-Business-Reason"
+      # Métricas RED derivadas de spans en el Gateway: sin ingesta duplicada (FinOps)
+      - name: OTEL_METRICS_EXPORTER
+        value: "none"
+      - name: OTEL_LOGS_EXPORTER
+        value: "none"

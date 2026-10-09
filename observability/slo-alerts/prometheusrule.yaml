@@ -1,0 +1,156 @@
+# SLO de payments-qr: reglas de grabación y alertas multiventana (fast burn = page, slow burn = ticket).
+# Generadas desde el slo.yaml del servicio (bancoplus-payments-qr) por modules/slo-burn-rate-alerts.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: slo-payments-qr
+  namespace: pagos
+  labels:
+    team: tribu-pagos
+spec:
+  groups:
+  - interval: 30s
+    name: slo:payments-qr:recording
+    rules:
+    - expr: (sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",status_code="STATUS_CODE_ERROR"}[15m])) or vector(0)) / sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[15m]))
+      labels:
+        slo_service: payments-qr
+        slo_sli: availability
+      record: slo:sli_error:ratio_rate15m
+    - expr: (sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",status_code="STATUS_CODE_ERROR"}[1m])) or vector(0)) / sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[1m]))
+      labels:
+        slo_service: payments-qr
+        slo_sli: availability
+      record: slo:sli_error:ratio_rate1m
+    - expr: (sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",status_code="STATUS_CODE_ERROR"}[30m])) or vector(0)) / sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[30m]))
+      labels:
+        slo_service: payments-qr
+        slo_sli: availability
+      record: slo:sli_error:ratio_rate30m
+    - expr: (sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",status_code="STATUS_CODE_ERROR"}[3m])) or vector(0)) / sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[3m]))
+      labels:
+        slo_service: payments-qr
+        slo_sli: availability
+      record: slo:sli_error:ratio_rate3m
+    - expr: (sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",status_code="STATUS_CODE_ERROR"}[5m])) or vector(0)) / sum(rate(traces_span_metrics_calls_total{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[5m]))
+      labels:
+        slo_service: payments-qr
+        slo_sli: availability
+      record: slo:sli_error:ratio_rate5m
+    - expr: vector(0.9995)
+      labels:
+        slo_service: payments-qr
+        slo_sli: availability
+      record: slo:objective:ratio
+    - expr: 1 - (slo:sli_error:ratio_rate30m{slo_service="payments-qr",slo_sli="availability"} / 0.0005)
+      labels:
+        slo_service: payments-qr
+        slo_sli: availability
+      record: slo:error_budget_remaining:ratio
+    - expr: 1 - (sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",le=~"800|800.0"}[15m])) / sum(rate(traces_span_metrics_duration_milliseconds_count{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[15m])))
+      labels:
+        slo_service: payments-qr
+        slo_sli: latency
+      record: slo:sli_error:ratio_rate15m
+    - expr: 1 - (sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",le=~"800|800.0"}[1m])) / sum(rate(traces_span_metrics_duration_milliseconds_count{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[1m])))
+      labels:
+        slo_service: payments-qr
+        slo_sli: latency
+      record: slo:sli_error:ratio_rate1m
+    - expr: 1 - (sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",le=~"800|800.0"}[30m])) / sum(rate(traces_span_metrics_duration_milliseconds_count{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[30m])))
+      labels:
+        slo_service: payments-qr
+        slo_sli: latency
+      record: slo:sli_error:ratio_rate30m
+    - expr: 1 - (sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",le=~"800|800.0"}[3m])) / sum(rate(traces_span_metrics_duration_milliseconds_count{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[3m])))
+      labels:
+        slo_service: payments-qr
+        slo_sli: latency
+      record: slo:sli_error:ratio_rate3m
+    - expr: 1 - (sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST /payments/qr",le=~"800|800.0"}[5m])) / sum(rate(traces_span_metrics_duration_milliseconds_count{service_name="payments-qr",span_kind="SPAN_KIND_SERVER",span_name="POST
+        /payments/qr"}[5m])))
+      labels:
+        slo_service: payments-qr
+        slo_sli: latency
+      record: slo:sli_error:ratio_rate5m
+    - expr: vector(0.99)
+      labels:
+        slo_service: payments-qr
+        slo_sli: latency
+      record: slo:objective:ratio
+    - expr: 1 - (slo:sli_error:ratio_rate30m{slo_service="payments-qr",slo_sli="latency"} / 0.01)
+      labels:
+        slo_service: payments-qr
+        slo_sli: latency
+      record: slo:error_budget_remaining:ratio
+  - name: slo:payments-qr:alerts
+    rules:
+    - alert: SLOFastBurn
+      annotations:
+        description: 'Fracción de eventos malos en 1m: {{ $value | humanizePercentage }}. Objetivo 99.95%. Mitigar primero: rollback del último release.'
+        runbook_url: https://github.com/anfedimo/sre-finops-otel-collector#runbook-error-budget
+        summary: 'payments-qr: availability quema el Error Budget a ≥ 14.4x (ventanas 5m/1m)'
+      expr: |-
+        slo:sli_error:ratio_rate5m{slo_service="payments-qr",slo_sli="availability"} > (14.4 * 0.0005)
+        and
+        slo:sli_error:ratio_rate1m{slo_service="payments-qr",slo_sli="availability"} > (14.4 * 0.0005)
+      labels:
+        journey: pago-qr
+        severity: page
+        slo_service: payments-qr
+        slo_sli: availability
+        team: tribu-pagos
+    - alert: SLOSlowBurn
+      annotations:
+        description: 'Fracción de eventos malos en 3m: {{ $value | humanizePercentage }}. Objetivo 99.95%. Mitigar primero: rollback del último release.'
+        runbook_url: https://github.com/anfedimo/sre-finops-otel-collector#runbook-error-budget
+        summary: 'payments-qr: availability quema el Error Budget a ≥ 6x (ventanas 15m/3m)'
+      expr: |-
+        slo:sli_error:ratio_rate15m{slo_service="payments-qr",slo_sli="availability"} > (6 * 0.0005)
+        and
+        slo:sli_error:ratio_rate3m{slo_service="payments-qr",slo_sli="availability"} > (6 * 0.0005)
+      labels:
+        journey: pago-qr
+        severity: ticket
+        slo_service: payments-qr
+        slo_sli: availability
+        team: tribu-pagos
+    - alert: SLOFastBurn
+      annotations:
+        description: 'Fracción de eventos malos en 1m: {{ $value | humanizePercentage }}. Objetivo 99%. Mitigar primero: rollback del último release.'
+        runbook_url: https://github.com/anfedimo/sre-finops-otel-collector#runbook-error-budget
+        summary: 'payments-qr: latency quema el Error Budget a ≥ 14.4x (ventanas 5m/1m)'
+      expr: |-
+        slo:sli_error:ratio_rate5m{slo_service="payments-qr",slo_sli="latency"} > (14.4 * 0.01)
+        and
+        slo:sli_error:ratio_rate1m{slo_service="payments-qr",slo_sli="latency"} > (14.4 * 0.01)
+      labels:
+        journey: pago-qr
+        severity: page
+        slo_service: payments-qr
+        slo_sli: latency
+        team: tribu-pagos
+    - alert: SLOSlowBurn
+      annotations:
+        description: 'Fracción de eventos malos en 3m: {{ $value | humanizePercentage }}. Objetivo 99%. Mitigar primero: rollback del último release.'
+        runbook_url: https://github.com/anfedimo/sre-finops-otel-collector#runbook-error-budget
+        summary: 'payments-qr: latency quema el Error Budget a ≥ 6x (ventanas 15m/3m)'
+      expr: |-
+        slo:sli_error:ratio_rate15m{slo_service="payments-qr",slo_sli="latency"} > (6 * 0.01)
+        and
+        slo:sli_error:ratio_rate3m{slo_service="payments-qr",slo_sli="latency"} > (6 * 0.01)
+      labels:
+        journey: pago-qr
+        severity: ticket
+        slo_service: payments-qr
+        slo_sli: latency
+        team: tribu-pagos

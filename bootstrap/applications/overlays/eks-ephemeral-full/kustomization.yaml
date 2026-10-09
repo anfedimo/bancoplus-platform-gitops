@@ -1,0 +1,10 @@
+# EKS · estado objetivo tras el cutover: Argo CD gobierna todas las waves; Terraform solo aprovisiona
+# el clúster y el bootstrap de Argo CD.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - path: payments-qr-path.yaml
+  - path: kube-prometheus-stack-values.yaml
+  - path: tempo-values.yaml

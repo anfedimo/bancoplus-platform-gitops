@@ -1,0 +1,42 @@
+# Smoke test de la capa 20 dentro del clúster. Script en ConfigMap smoke-onboarding; contraseña de
+# Grafana en Secret grafana-admin. Ver Makefile: make smoke-onboarding.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: smoke-onboarding
+  namespace: smoke-test
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: smoke
+          image: python:3.13-slim
+          command: ["python", "-u", "/scripts/smoke_onboarding.py"]
+          env:
+            - name: GRAFANA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-admin
+                  key: password
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { memory: 256Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: smoke-onboarding

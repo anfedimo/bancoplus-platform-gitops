@@ -1,0 +1,11 @@
+# Activación por namespace: todo pod Java creado en pagos recibe el agente OpenTelemetry.
+# La vertical migra con este manifiesto; ninguna aplicación cambia código, imagen ni Deployment.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pagos
+  labels:
+    team: tribu-pagos
+    migration.bancoplus.co/wave: F1-piloto
+  annotations:
+    instrumentation.opentelemetry.io/inject-java: "true"

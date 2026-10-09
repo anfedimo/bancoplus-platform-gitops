@@ -1,0 +1,19 @@
+# Valores específicos de EKS: persistencia gp3 y Grafana en NLB con allowlist.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+spec:
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 92.2.0
+      helm:
+        releaseName: kube-prometheus-stack
+        valueFiles:
+          - $values/platform-addons/kube-prometheus-stack/values.yaml
+          - $values/platform-addons/kube-prometheus-stack/values-eks-ephemeral.yaml
+    - repoURL: https://github.com/anfedimo/bancoplus-platform-gitops.git
+      targetRevision: main
+      ref: values

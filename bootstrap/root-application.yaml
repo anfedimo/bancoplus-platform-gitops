@@ -1,0 +1,23 @@
+# Aplicación raíz del patrón App of Apps (entorno eks-ephemeral).
+# Terraform la crea en el bootstrap (modules/argocd-bootstrap); este manifiesto es el equivalente
+# declarativo para un bootstrap manual: kubectl apply -n argocd -f bootstrap/root-application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/anfedimo/bancoplus-platform-gitops.git
+    targetRevision: main
+    path: bootstrap/applications/overlays/eks-ephemeral
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
