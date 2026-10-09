@@ -96,6 +96,15 @@ alternateConfig:
     extensions:
     - health_check
     pipelines:
+      logs:
+        exporters:
+        - load_balancing
+        processors:
+        - memory_limiter
+        - k8s_attributes
+        - batch
+        receivers:
+        - otlp
       traces:
         exporters:
         - load_balancing

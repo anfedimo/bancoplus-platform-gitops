@@ -56,6 +56,19 @@ extraManifests:
 
 alternateConfig:
   connectors:
+    # Log-to-Metrics en el Edge: el log crudo no sale del Gateway, solo su conteo
+    count:
+      logs:
+        app.log.errors:
+          attributes:
+          - key: service.name
+          conditions:
+          - severity_number >= SEVERITY_NUMBER_ERROR
+          description: Registros de log con severidad ERROR o superior por servicio
+        app.log.records:
+          attributes:
+          - key: service.name
+          description: Registros de log recibidos por servicio
     forward/sampling: {}
     span_metrics:
       dimensions:
@@ -212,6 +225,20 @@ alternateConfig:
     extensions:
     - health_check
     pipelines:
+      logs/ingest:
+        exporters:
+        - count
+        processors:
+        - memory_limiter
+        receivers:
+        - otlp
+      metrics/logs:
+        exporters:
+        - prometheus
+        processors:
+        - batch
+        receivers:
+        - count
       metrics/red:
         exporters:
         - prometheus

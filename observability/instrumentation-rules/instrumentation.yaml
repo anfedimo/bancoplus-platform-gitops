@@ -28,5 +28,6 @@ spec:
       # Métricas RED derivadas de spans en el Gateway: sin ingesta duplicada (FinOps)
       - name: OTEL_METRICS_EXPORTER
         value: "none"
+      # Logs al Gateway solo para Log-to-Metrics: se cuentan en el Edge y no se almacenan
       - name: OTEL_LOGS_EXPORTER
-        value: "none"
+        value: "otlp"
