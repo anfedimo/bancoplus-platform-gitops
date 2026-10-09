@@ -1,0 +1,22 @@
+# Proyecto de plataforma: limita repositorios de origen y destinos de las aplicaciones hijas.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  description: Plataforma de Confiabilidad · add-ons, observabilidad y workloads gobernados por GitOps
+  sourceRepos:
+    - https://github.com/anfedimo/bancoplus-platform-gitops.git
+    - https://charts.jetstack.io
+    - https://open-telemetry.github.io/opentelemetry-helm-charts
+    - https://prometheus-community.github.io/helm-charts
+    - https://grafana.github.io/helm-charts
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

@@ -1,0 +1,13 @@
+# Validación de la entrega en cada sincronización (Argo CD PostSync): agente inyectado, traza distribuida,
+# contrato X-Business-*, PII enmascarada, Dual-Shipping y Grafana. Un FAIL marca la sincronización como fallida.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+resources:
+  - postsync-smoke.yaml
+configMapGenerator:
+  - name: smoke-onboarding
+    namespace: observability
+    files:
+      - smoke_onboarding.py
+    options:
+      disableNameSuffixHash: true

@@ -1,0 +1,65 @@
+# EKS · migración incremental. Argo CD gobierna instrumentación, SLO y workloads (equivalente a la capa
+# 20 de Terraform). Las waves 0-2 de plataforma siguen bajo Terraform (capas 00 y 10) hasta el cutover:
+# cambiar el path de la aplicación raíz a overlays/eks-ephemeral-full.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - path: payments-qr-path.yaml
+  - patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: namespaces
+        namespace: argocd
+  - patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: cert-manager
+        namespace: argocd
+  - patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: opentelemetry-operator
+        namespace: argocd
+  - patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: kube-prometheus-stack
+        namespace: argocd
+  - patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: tempo
+        namespace: argocd
+  - patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: apm-legacy-standin
+        namespace: argocd
+  - patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: otel-gateway
+        namespace: argocd
+  - patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: otel-node-agent
+        namespace: argocd

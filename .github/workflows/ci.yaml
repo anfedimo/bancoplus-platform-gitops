@@ -1,0 +1,72 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  KUBERNETES_VERSION: "1.35.0"
+  CRDS_CATALOG: https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json
+
+jobs:
+  manifests:
+    name: kustomize · helm · kubeconform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Herramientas
+        run: |
+          curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz -C /usr/local/bin kubeconform
+      - name: Render y validación de esquemas (Kustomize)
+        run: |
+          set -euo pipefail
+          for dir in $(find bootstrap observability platform-addons workloads -name kustomization.yaml -exec dirname {} \; | sort); do
+            grep -q "kind: Component" "$dir/kustomization.yaml" && continue
+            echo "::group::$dir"
+            kubectl kustomize "$dir" | kubeconform -strict -summary -kubernetes-version "$KUBERNETES_VERSION" \
+              -schema-location default -schema-location "$CRDS_CATALOG"
+            echo "::endgroup::"
+          done
+      - name: Render de charts con los values del repositorio
+        run: |
+          set -euo pipefail
+          helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add jetstack https://charts.jetstack.io
+          helm template t open-telemetry/opentelemetry-collector --version 0.175.1 -f observability/otel-gateway/values.yaml >/dev/null
+          helm template t open-telemetry/opentelemetry-collector --version 0.175.1 -f observability/otel-node-agent/values.yaml >/dev/null
+          helm template t open-telemetry/opentelemetry-operator --version 0.124.1 -f platform-addons/opentelemetry-operator/values.yaml >/dev/null
+          helm template t prometheus-community/kube-prometheus-stack --version 92.2.0 -f platform-addons/kube-prometheus-stack/values.yaml -f platform-addons/kube-prometheus-stack/values-eks-ephemeral.yaml >/dev/null
+          helm template t grafana/tempo --version 1.24.4 -f platform-addons/tempo/values.yaml -f platform-addons/tempo/values-eks-ephemeral.yaml >/dev/null
+          helm template t jetstack/cert-manager --version v1.21.2 -f platform-addons/cert-manager/values.yaml >/dev/null
+
+  pii-regression:
+    name: PII-REGEX-001 · config del Gateway (toolkit sre-finops-otel-collector)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: anfedimo/sre-finops-otel-collector
+          path: toolkit
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: pip install -q pyyaml
+      - name: Extraer la configuración del Gateway y ejecutar la suite de regresión
+        run: |
+          python -c "import yaml; v = yaml.safe_load(open('observability/otel-gateway/values.yaml')); yaml.safe_dump(v['alternateConfig'], open('/tmp/gateway.yaml', 'w'))"
+          python toolkit/scripts/test_pii_redaction.py --config /tmp/gateway.yaml
+
+  scripts:
+    name: shellcheck · smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: shellcheck -S warning tests/*.sh
+      - run: python3 -m py_compile tests/*.py workloads/payments-qr/hooks/*.py

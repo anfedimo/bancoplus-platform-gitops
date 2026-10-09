@@ -1,0 +1,28 @@
+# EKS: Grafana en NLB con allowlist y persistencia gp3. La allowlist se gestiona por PR (IP de operación).
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests: { storage: 20Gi }
+
+grafana:
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: Environment=ephemeral-poc,Owner=plataforma-confiabilidad,Purpose=evaluacion-tecnica,TTL=72h
+    loadBalancerSourceRanges:
+      - 192.0.2.10/32 # reemplazar por la IP de operación mediante PR
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: gp3
+    accessModes: [ReadWriteOnce]
+    size: 5Gi
+  # Volumen RWO: RollingUpdate dejaría el pod nuevo esperando el volumen del anterior
+  deploymentStrategy:
+    type: Recreate

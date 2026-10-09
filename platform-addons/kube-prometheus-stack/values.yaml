@@ -1,0 +1,52 @@
+# Componentes del control plane no accesibles en clústeres gestionados
+kubeEtcd: { enabled: false }
+kubeControllerManager: { enabled: false }
+kubeScheduler: { enabled: false }
+kubeProxy: { enabled: false }
+nodeExporter: { enabled: false }
+
+# FinOps del propio stack: sin el mixin de Kubernetes (cientos de reglas y scrapes no usados)
+defaultRules: { create: false }
+kubeApiServer: { enabled: false }
+kubelet: { enabled: false }
+coreDns: { enabled: false }
+
+prometheus:
+  prometheusSpec:
+    retention: 72h
+    # Descubre ServiceMonitor y PrometheusRule de cualquier namespace (Gateway, verticales)
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    resources:
+      requests: { cpu: 200m, memory: 512Mi }
+      limits: { memory: 1536Mi }
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests: { cpu: 20m, memory: 64Mi }
+
+grafana:
+  # Credenciales desde un Secret gestionado fuera de Git (External Secrets Operator + Secrets Manager)
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { memory: 512Mi }
+  additionalDataSources:
+    - name: Tempo (backend OTel)
+      type: tempo
+      uid: tempo
+      url: http://tempo.observability.svc.cluster.local:3200
+      access: proxy
+      jsonData:
+        serviceMap: { datasourceUid: prometheus }
+        nodeGraph: { enabled: true }
+    - name: APM legado (stand-in)
+      type: jaeger
+      uid: apm-legacy
+      url: http://apm-legacy-standin.observability.svc.cluster.local:16686
+      access: proxy

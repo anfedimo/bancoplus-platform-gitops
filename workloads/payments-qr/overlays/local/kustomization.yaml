@@ -1,0 +1,18 @@
+# Minikube: imagen construida en el nodo (minikube image build), sin registro.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+components:
+  - ../../hooks
+images:
+  - name: payments-qr
+    newName: bancoplus/payments-qr
+    newTag: 1.0.0
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never

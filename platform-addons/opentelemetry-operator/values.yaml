@@ -1,0 +1,24 @@
+# El webhook de inyección lo sirven todas las réplicas: con 1 réplica, un reinicio deja pods sin agente
+# (el webhook de pods usa failurePolicy Ignore).
+replicaCount: 2
+pdb:
+  create: true
+  minAvailable: 1
+manager:
+  collectorImage:
+    repository: otel/opentelemetry-collector-contrib
+    tag: 0.162.0
+  # Agente Java fijado: una actualización del Operator no cambia el agente desplegado
+  autoInstrumentationImage:
+    java:
+      repository: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java
+      tag: 2.32.0
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+admissionWebhooks:
+  certManager:
+    enabled: true

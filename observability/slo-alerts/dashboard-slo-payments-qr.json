@@ -1,0 +1,205 @@
+{
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "targets": [
+        {
+          "expr": "clamp_min(slo:error_budget_remaining:ratio{slo_service=\"payments-qr\",slo_sli=\"availability\"}, 0)",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Budget restante · disponibilidad (30m)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 3,
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "targets": [
+        {
+          "expr": "1 - slo:sli_error:ratio_rate30m{slo_service=\"payments-qr\",slo_sli=\"availability\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "SLI disponibilidad (30m) · objetivo 99.95%",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 14.4
+              }
+            ]
+          },
+          "unit": "x"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "targets": [
+        {
+          "expr": "slo:sli_error:ratio_rate5m{slo_service=\"payments-qr\",slo_sli=\"availability\"} / 0.0005",
+          "legendFormat": "ventana 5m",
+          "refId": "W5m"
+        },
+        {
+          "expr": "slo:sli_error:ratio_rate1m{slo_service=\"payments-qr\",slo_sli=\"availability\"} / 0.0005",
+          "legendFormat": "ventana 1m",
+          "refId": "W1m"
+        }
+      ],
+      "title": "Burn rate · disponibilidad (umbral fast 14.4x)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
+      "id": 4,
+      "targets": [
+        {
+          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=\"payments-qr\",span_kind=\"SPAN_KIND_SERVER\",span_name=\"POST /payments/qr\",http_response_status_code=~\"5..\"}[1m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"payments-qr\",span_kind=\"SPAN_KIND_SERVER\",span_name=\"POST /payments/qr\"}[1m]))",
+          "legendFormat": "HTTP 5xx (visión por código de estado)",
+          "refId": "A"
+        },
+        {
+          "expr": "slo:sli_error:ratio_rate1m{slo_service=\"payments-qr\",slo_sli=\"availability\"}",
+          "legendFormat": "Falla técnica real (SLI normalizado)",
+          "refId": "B"
+        }
+      ],
+      "title": "Tasa de error por código HTTP vs. tasa de falla técnica real",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "stacking": {
+              "mode": "normal"
+            }
+          },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
+      "id": 5,
+      "targets": [
+        {
+          "expr": "sum by (business_outcome) (rate(traces_span_metrics_calls_total{service_name=\"payments-qr\",span_kind=\"SPAN_KIND_SERVER\",span_name=\"POST /payments/qr\"}[1m]))",
+          "legendFormat": "{{business_outcome}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Resultado de negocio (transacciones/s)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "slo",
+    "error-budget",
+    "tribu-pagos"
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "SLO · payments-qr (pago-qr)",
+  "uid": "slo-payments-qr"
+}

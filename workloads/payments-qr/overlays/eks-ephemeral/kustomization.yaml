@@ -1,0 +1,20 @@
+# EKS (Graviton): imagen desde ECR y programación en nodos arm64.
+# Promoción: el pipeline de bancoplus-payments-qr publica :<commit-sha>; se actualiza newTag por PR.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+components:
+  - ../../hooks
+images:
+  - name: payments-qr
+    newName: 512943205201.dkr.ecr.us-east-1.amazonaws.com/bancoplus/payments-qr
+    newTag: 1.0.0
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          kubernetes.io/arch: arm64

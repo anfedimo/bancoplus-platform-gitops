@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: pagos
+resources:
+  - prometheusrule.yaml
+# Dashboard de Error Budget: el sidecar de Grafana descubre el ConfigMap por la etiqueta grafana_dashboard
+configMapGenerator:
+  - name: slo-dashboard-payments-qr
+    files:
+      - slo-payments-qr.json=dashboard-slo-payments-qr.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"
+        team: tribu-pagos

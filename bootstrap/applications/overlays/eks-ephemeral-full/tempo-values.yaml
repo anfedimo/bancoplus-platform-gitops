@@ -1,0 +1,19 @@
+# Valores específicos de EKS: persistencia gp3.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tempo
+  namespace: argocd
+spec:
+  sources:
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: tempo
+      targetRevision: 1.24.4
+      helm:
+        releaseName: tempo
+        valueFiles:
+          - $values/platform-addons/tempo/values.yaml
+          - $values/platform-addons/tempo/values-eks-ephemeral.yaml
+    - repoURL: https://github.com/anfedimo/bancoplus-platform-gitops.git
+      targetRevision: main
+      ref: values
