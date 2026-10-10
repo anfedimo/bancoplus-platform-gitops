@@ -113,6 +113,8 @@ alternateConfig:
     health_check:
       endpoint: 0.0.0.0:13133
   processors:
+    # El connector count emite deltas por lote; Prometheus requiere contadores acumulados
+    deltatocumulative: {}
     batch:
       send_batch_size: 1024
       timeout: 5s
@@ -236,6 +238,7 @@ alternateConfig:
         exporters:
         - prometheus
         processors:
+        - deltatocumulative
         - batch
         receivers:
         - count
