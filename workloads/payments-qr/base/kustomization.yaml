@@ -6,3 +6,5 @@ resources:
   - service-payments-qr.yaml
   - deployment-fraud-api.yaml
   - service-fraud-api.yaml
+  - deployment-convenios-api.yaml
+  - service-convenios-api.yaml

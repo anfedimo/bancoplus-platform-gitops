@@ -34,6 +34,8 @@ spec:
               value: -XX:ActiveProcessorCount=2 -XX:MaxRAMPercentage=75
             - name: FRAUD_API_URL
               value: http://fraud-api
+            - name: CONVENIOS_API_URL
+              value: http://convenios-api
           # Sin límite de CPU: el agente instrumenta bytecode en el arranque
           resources:
             requests: { cpu: 250m, memory: 384Mi }

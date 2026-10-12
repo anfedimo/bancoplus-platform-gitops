@@ -24,7 +24,7 @@ spec:
   java:
     env:
       - name: OTEL_INSTRUMENTATION_HTTP_SERVER_CAPTURE_RESPONSE_HEADERS
-        value: "X-Business-Operation,X-Business-Outcome,X-Business-Reason"
+        value: "X-Business-Operation,X-Business-Outcome,X-Business-Reason,X-Business-Transaction-Id,X-Business-Amount,X-Business-Biller,X-Business-Biller-Name,X-Business-Customer"
       # Métricas RED derivadas de spans en el Gateway: sin ingesta duplicada (FinOps)
       - name: OTEL_METRICS_EXPORTER
         value: "none"
