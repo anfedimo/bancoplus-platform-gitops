@@ -98,7 +98,7 @@ alternateConfig:
         queue_size: 5000
       tls:
         insecure: true
-    otlp_http/dynatrace:
+    otlp_http/apm-legacy:
       endpoint: http://apm-legacy-standin.observability.svc.cluster.local:4318
       headers:
         Authorization: Api-Token ${env:DT_API_TOKEN}
@@ -261,7 +261,7 @@ alternateConfig:
         - span_metrics
       traces/export:
         exporters:
-        - otlp_http/dynatrace
+        - otlp_http/apm-legacy
         - otlp_grpc/backend-otel
         processors:
         - tail_sampling

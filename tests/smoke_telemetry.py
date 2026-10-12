@@ -74,7 +74,7 @@ def gate_dual_shipping():
     failed = prom(f'sum({{__name__=~"otelcol_exporter_send_failed_spans(_total)?",namespace="{NS}",service="otel-gateway"}})')
     by_exporter = {r["metric"]["exporter"]: float(r["value"][1]) for r in sent}
     failures = float(failed[0]["value"][1]) if failed else 0.0
-    expected = {"otlp_http/dynatrace", "otlp_grpc/backend-otel"}
+    expected = {"otlp_http/apm-legacy", "otlp_grpc/backend-otel"}
     ok = expected <= by_exporter.keys() and all(by_exporter[e] > 0 for e in expected) and failures == 0
     detail = " ".join(f"{k}={v:,.0f}" for k, v in sorted(by_exporter.items()))
     log("L10-002", ok, f"{detail} send_failed={failures:,.0f}")
